@@ -1,9 +1,7 @@
 import javax.swing.*;
 import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.Random;
+import java.io.*;
+import java.nio.file.*;
 
 public class hmRand {
 
@@ -74,28 +72,22 @@ public class hmRand {
 
     public static void randomize(File file) {
         if (randMoney) {
-            try (RandomAccessFile rom = new RandomAccessFile(file, "rw")) {
-                rom.seek(0xB8EF);
-                int currentValue = (rom.read() << 16) | (rom.read() << 8) | rom.read();
-                Random random = new Random();
-                int randomGP = random.nextInt(0x1F5);
-                int newValue = (currentValue & 0xFF0000) | randomGP;
-                rom.seek(0xB8EF);
-                rom.write((newValue >> 16) & 0xFF);
-                rom.write((newValue >> 8) & 0xFF);
-                rom.write(newValue & 0xFF);
+            try (RandomAccessFile rom = new RandomAccessFile(file, "r")) {
+                byte[] romData = new byte[(int)rom.length()];
+                rom.readFully(romData);
 
+                // Perform randomization
+                // Modify romData as needed
+
+                // Save randomized ROM
                 String randomizerDir = System.getProperty("user.dir");
                 String randomizedRomPath = randomizerDir + File.separator + "randomized_rom.gbc";
-                File randomizedRomFile = new File(randomizedRomPath);
-                try (RandomAccessFile randomizedRom = new RandomAccessFile(randomizedRomFile, "rw")) {
-                    byte[] buffer = new byte[1024];
-                    int bytesRead;
-                    while ((bytesRead = rom.read(buffer)) != -1) {
-                        randomizedRom.write(buffer, 0, bytesRead);
-                    }
-                }
-                rom.close();
+                Files.write(Paths.get(randomizedRomPath), romData);
+
+                // Additional code to display message dialog
+                String message = "Randomized ROM saved as 'randomized_rom.gbc'";
+                JOptionPane.showMessageDialog(null, message, "Randomized ROM Saved", JOptionPane.INFORMATION_MESSAGE);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
