@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
 import java.nio.file.*;
+import java.util.Random;
 
 public class hmRand {
 
@@ -77,7 +78,14 @@ public class hmRand {
                 rom.readFully(romData);
 
                 // Perform randomization
-                // Modify romData as needed
+                Random random = new Random();
+                int randomGP = random.nextInt(501); // Generates a random number between 0 and 500
+
+                // Modify the appropriate bytes in romData with the new randomGP value
+                int offset = 0xB8EF; // Memory address where money is stored
+                romData[offset] = (byte)((randomGP >> 16) & 0xFF);
+                romData[offset + 1] = (byte)((randomGP >> 8) & 0xFF);
+                romData[offset + 2] = (byte)(randomGP & 0xFF);
 
                 // Save randomized ROM
                 String randomizerDir = System.getProperty("user.dir");
@@ -85,7 +93,7 @@ public class hmRand {
                 Files.write(Paths.get(randomizedRomPath), romData);
 
                 // Additional code to display message dialog
-                String message = "Randomized ROM saved as 'randomized_rom.gbc'";
+                String message = "Randomized ROM saved as 'randomized_rom.gbc'\nNew GP value: " + randomGP;
                 JOptionPane.showMessageDialog(null, message, "Randomized ROM Saved", JOptionPane.INFORMATION_MESSAGE);
 
             } catch (IOException e) {
