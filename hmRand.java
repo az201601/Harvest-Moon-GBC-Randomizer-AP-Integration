@@ -50,7 +50,7 @@ public class hmRand {
         panel.add(browseButton);
 
         JCheckBox rmoney = new JCheckBox("Randomize the amount of Gold you start with");
-        rmoney.setBounds(10, 80, 200, 25);
+        rmoney.setBounds(10, 80, 250, 25);
         panel.add(rmoney);
         rmoney.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent ie) {
@@ -73,7 +73,7 @@ public class hmRand {
 
     public static void randomize(File file) {
         if (randMoney) {
-            try (RandomAccessFile rom = new RandomAccessFile(file, "r")) {
+            try (RandomAccessFile rom = new RandomAccessFile(file, "rw")) {
                 byte[] romData = new byte[(int)rom.length()];
                 rom.readFully(romData);
 
@@ -82,10 +82,10 @@ public class hmRand {
                 int randomGP = random.nextInt(501); // Generates a random number between 0 and 500
 
                 // Modify the appropriate bytes in romData with the new randomGP value
-                int offset = 0xB8EF; // Memory address where money is stored
-                romData[offset] = (byte)((randomGP >> 16) & 0xFF);
-                romData[offset + 1] = (byte)((randomGP >> 8) & 0xFF);
-                romData[offset + 2] = (byte)(randomGP & 0xFF);
+                int offset1 = 0x752C9; // New address for starting gold (high byte)
+                int offset2 = 0x752C4; // New address for starting gold (low byte)
+                romData[offset1] = (byte)((randomGP >> 8) & 0xFF);
+                romData[offset2] = (byte)(randomGP & 0xFF);
 
                 // Save randomized ROM
                 String randomizerDir = System.getProperty("user.dir");
