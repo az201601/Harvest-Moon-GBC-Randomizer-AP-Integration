@@ -7,6 +7,7 @@ import java.util.Random;
 public class hmRand {
 
     public static boolean randMoney = false;
+	public static boolean noTools = false;
 
     public static void main(String[] args) {
         // Create a JFrame (window)
@@ -57,9 +58,18 @@ public class hmRand {
                 randMoney = ie.getStateChange() == ItemEvent.SELECTED;
             }
         });
+		
+		JCheckBox randTools = new JCheckBox("Start with no Tools");
+        randTools.setBounds(10, 110, 250, 25);
+        panel.add(randTools);
+        randTools.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent ie) {
+                noTools = ie.getStateChange() == ItemEvent.SELECTED;
+            }
+        });
 
         JButton randomizeButton = new JButton("Randomize!");
-        randomizeButton.setBounds(10, 110, 100, 25);
+        randomizeButton.setBounds(10, 140, 100, 25);
         randomizeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -99,6 +109,19 @@ public class hmRand {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+			
+			if (noTools) 
+			{
+				try (RandomAccessFile rom = new RandomAccessFile(file, "rw")) 
+				{
+					rom.seek(0x751FB);
+					rom.writeByte(0x00);
+				} 
+				catch (IOException e) 
+				{
+					e.printStackTrace();
+				}
+			}
+		}
     }
 }
